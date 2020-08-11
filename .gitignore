@@ -1,6 +1,9 @@
-# Gem5
+### Gem5 ###
 gem5/
 m5out/
+
+### Parsec ###
+parsec-benchmark/
 
 ### C ###
 # Prerequisites

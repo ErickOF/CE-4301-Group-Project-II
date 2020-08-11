@@ -22,6 +22,11 @@ NO_COLOR="\033[0m"
 
 
 #-----------------------------INSTALLATION-----------------------------
+# Updating...
+echo "${GREEN}Updating${LIGHT_GRAY}"
+sudo apt-get update
+echo "${LIGHT_GREEN}Done${LIGHT_GRAY}"
+
 # Installing Python 3
 echo "${GREEN}Installing Python 3${LIGHT_GRAY}"
 sudo apt-get install python3
@@ -35,14 +40,11 @@ echo "${LIGHT_GREEN}Done${LIGHT_GRAY}"
 # Performance tools for Gem5
 sudo apt-get install libgoogle-perftools-dev
 
-# Cloning Gem5 source code if not exist
-if [ ! -d ${BUILD_DIR} ]; then
-    echo "${GREEN}Cloning Gem5 source code...${LIGHT_GRAY}"
-    git clone https://gem5.googlesource.com/public/gem5
-    echo "${LIGHT_GREEN}Done${LIGHT_GRAY}"
-else
-    echo "${YELLOW}Gem5 source code already exists.${LIGHT_GRAY}"
-fi
+# Cloning Gem5 source code
+echo "${GREEN}Cloning Gem5 source code...${LIGHT_GRAY}"
+git clone https://gem5.googlesource.com/public/gem5
+echo "${LIGHT_GREEN}Done${LIGHT_GRAY}"
+
 
 # Compiling Gem5
 echo "${GREEN}Compiling Gem5...${LIGHT_GRAY}"
@@ -51,3 +53,4 @@ cd gem5
 scons build/X86/gem5.opt -j "$(nproc)"
 cd ..
 echo "${LIGHT_GREEN}Done${LIGHT_GRAY}"
+echo "${YELLOW}Gem5 compilation already exists.${LIGHT_GRAY}"
