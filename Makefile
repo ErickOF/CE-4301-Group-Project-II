@@ -17,3 +17,6 @@ test_gem5:
 
 test_parsec:
 	@echo ""
+
+test_example:
+	@gem5/build/X86/gem5.opt project/test.py
