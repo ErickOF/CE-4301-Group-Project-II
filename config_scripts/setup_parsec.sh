@@ -30,27 +30,16 @@ if [ ! -d "./parsec" ]; then
     mkdir parsec
 fi
 
-#curl https://parsec.cs.princeton.edu/download/2.1/parsec-2.1.tar.gz --output ./parsec/parsec-2.1.tar.gz
-#curl http://parsec.cs.princeton.edu/download/2.1/binaries/parsec-2.1-amd64-linux.tar.gz --output ./parsec/parsec-2.1-amd64-linux.tar.gz
 git clone https://github.com/darchr/parsec-benchmark.git
 echo "${LIGHT_GREEN}Done${LIGHT_GRAY}"
 
-#echo "${GREEN}Extracting PARSEC...${LIGHT_GRAY}"
-#tar -xzvf ./parsec/parsec-2.1.tar.gz
-#tar -xzvf ./parsec/parsec-2.1-amd64-linux.tar.gz
 
-#rm -r parsec
-#echo "${LIGHT_GREEN}Done${LIGHT_GRAY}"
 
 
 # Building PARSEC
 echo "${GREEN}Building PARSEC...${LIGHT_GRAY}"
 
 cd parsec-benchmark
-# Run this manually if there's an error
-#./configure
-#source ./env.sh
-
 parsecmgmt -a build -p splash2x.barnes
 echo "${LIGHT_GREEN}Done${LIGHT_GRAY}"
 
