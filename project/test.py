@@ -110,9 +110,6 @@ process.cmd = ['./project/hello']
 system.cpu.workload = process
 system.cpu.createThreads()
 
-print(system.cache)
-print(system.cache.assoc)
-
 # The final thing we need to do is instantiate the system and begin
 # execution. First, we create the Root object. Then we instantiate the
 # simulation. The instantiation process goes through all of the

@@ -5,6 +5,9 @@ m5out/
 ### Parsec ###
 parsec-benchmark/
 
+### Project ###
+project/debug_out
+
 ### C ###
 # Prerequisites
 *.d
