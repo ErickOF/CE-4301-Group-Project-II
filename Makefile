@@ -20,3 +20,6 @@ test_parsec:
 
 test_example:
 	@gem5/build/X86/gem5.opt project/test.py
+
+run_project_test1:
+	@gem5/build/X86/gem5.opt project/project.py -j ${CORES}
