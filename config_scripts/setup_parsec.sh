@@ -34,15 +34,12 @@ git clone https://github.com/darchr/parsec-benchmark.git
 echo "${LIGHT_GREEN}Done${LIGHT_GRAY}"
 
 
-
-
 # Building PARSEC
 echo "${GREEN}Building PARSEC...${LIGHT_GRAY}"
 
 cd parsec-benchmark
 parsecmgmt -a build -p splash2x.barnes
 echo "${LIGHT_GREEN}Done${LIGHT_GRAY}"
-
 
 
 # Testing PARSEC
