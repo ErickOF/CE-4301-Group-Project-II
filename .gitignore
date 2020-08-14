@@ -1,6 +1,7 @@
 ### Gem5 ###
 gem5/
 m5out/
+enhanced_m5out/
 
 ### Parsec ###
 parsec-benchmark/

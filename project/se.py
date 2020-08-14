@@ -36,10 +36,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Simple test script
-#
-# "m5 test.py"
-
 from __future__ import print_function
 from __future__ import absolute_import
 
@@ -67,9 +63,9 @@ from common.FileSystemConfig import config_filesystem
 from common.Caches import *
 from common.cpu2000 import *
 
+
 def get_processes(options):
     """Interprets provided options and returns a list of processes"""
-
     multiprocesses = []
     inputs = []
     outputs = []
@@ -77,6 +73,7 @@ def get_processes(options):
     pargs = []
 
     workloads = options.cmd.split(';')
+
     if options.input != "":
         inputs = options.input.split(';')
     if options.output != "":
@@ -87,6 +84,7 @@ def get_processes(options):
         pargs = options.options.split(';')
 
     idx = 0
+
     for wrkld in workloads:
         process = Process(pid = 100 + idx)
         process.executable = wrkld
@@ -112,30 +110,46 @@ def get_processes(options):
         idx += 1
 
     if options.smt:
-        assert(options.cpu_type == "DerivO3CPU")
+        assert(options.cpu_type == 'DerivO3CPU')
         return multiprocesses, idx
     else:
         return multiprocesses, 1
 
 
+# Get options
 parser = optparse.OptionParser()
 Options.addCommonOptions(parser)
 Options.addSEOptions(parser)
+
+parser.add_option('--l1d_hwp_type', help='L1 Data Cache Prefetcher')
+parser.add_option('--l1d_rp', help='L1 Data Cache Replacement Policy')
+parser.add_option('--l1d_ll', help='L1 Data Cache Lookup Latency')
+parser.add_option('--l1i_hwp_type', help='L1 Instruction Cache Prefetcher')
+parser.add_option('--l1i_rp', help='L1 Instruction Cache Replacement Policy')
+parser.add_option('--l1i_ll', help='L1 Instruction Cache Lookup Latency')
+parser.add_option('--l2_hwp_type', help='L2 Cache Prefetcher')
+parser.add_option('--l2_rp', help='L2 Cache Replacement Policy')
+parser.add_option('--l2_ll', help='L2 Cache Lookup Latency')
 
 if '--ruby' in sys.argv:
     Ruby.define_options(parser)
 
 (options, args) = parser.parse_args()
 
+
+# Error if not args were provided
 if args:
-    print("Error: script doesn't take any positional arguments")
+    print('Error: script doesn\'t take any positional arguments')
     sys.exit(1)
 
+
+# Creating multiprocess
 multiprocesses = []
 numThreads = 1
 
 if options.bench:
     apps = options.bench.split("-")
+
     if len(apps) != options.num_cpus:
         print("number of benchmarks not equal to set num_cpus!")
         sys.exit(1)
@@ -153,11 +167,12 @@ if options.bench:
             print("Unable to find workload for %s: %s" %
                   (buildEnv['TARGET_ISA'], app),
                   file=sys.stderr)
+
             sys.exit(1)
 elif options.cmd:
     multiprocesses, numThreads = get_processes(options)
 else:
-    print("No workload specified. Exiting!\n", file=sys.stderr)
+    print('No workload specified. Exiting!\n', file=sys.stderr)
     sys.exit(1)
 
 
@@ -166,31 +181,36 @@ CPUClass.numThreads = numThreads
 
 # Check -- do not allow SMT with multiple CPUs
 if options.smt and options.num_cpus > 1:
-    fatal("You cannot use SMT with multiple CPUs!")
+    fatal('You cannot use SMT with multiple CPUs!')
 
 np = options.num_cpus
+
+
+
+############################# CREATING THE SYSTEM ############################
 system = System(cpu = [CPUClass(cpu_id=i) for i in range(np)],
                 mem_mode = test_mem_mode,
                 mem_ranges = [AddrRange(options.mem_size)],
                 cache_line_size = options.cacheline_size,
                 workload = NULL)
 
+# Setting multithread
 if numThreads > 1:
     system.multi_thread = True
 
 # Create a top-level voltage domain
-system.voltage_domain = VoltageDomain(voltage = options.sys_voltage)
+system.voltage_domain = VoltageDomain(voltage=options.sys_voltage)
 
 # Create a source clock for the system and set the clock period
-system.clk_domain = SrcClockDomain(clock =  options.sys_clock,
-                                   voltage_domain = system.voltage_domain)
+system.clk_domain = SrcClockDomain(clock=options.sys_clock,
+                                   voltage_domain=system.voltage_domain)
 
 # Create a CPU voltage domain
 system.cpu_voltage_domain = VoltageDomain()
 
 # Create a separate clock domain for the CPUs
-system.cpu_clk_domain = SrcClockDomain(clock = options.cpu_clock,
-                                       voltage_domain =
+system.cpu_clk_domain = SrcClockDomain(clock=options.cpu_clock,
+                                       voltage_domain=
                                        system.cpu_voltage_domain)
 
 # If elastic tracing is enabled, then configure the cpu and attach the elastic
@@ -198,6 +218,10 @@ system.cpu_clk_domain = SrcClockDomain(clock = options.cpu_clock,
 if options.elastic_trace_en:
     CpuConfig.config_etrace(CPUClass, system.cpu, options)
 
+
+
+
+############################### CREATING CPUs ################################
 # All cpus belong to a common cpu_clk_domain, therefore running at a common
 # frequency.
 for cpu in system.cpu:
@@ -210,15 +234,17 @@ if ObjectList.is_kvm_cpu(CPUClass) or ObjectList.is_kvm_cpu(FutureClass):
             process.useArchPT = True
             process.kvmInSE = True
     else:
-        fatal("KvmCPU can only be used in SE mode with x86")
+        fatal('KvmCPU can only be used in SE mode with x86')
 
 # Sanity check
 if options.simpoint_profile:
     if not ObjectList.is_noncaching_cpu(CPUClass):
-        fatal("SimPoint/BPProbe should be done with an atomic cpu")
+        fatal('SimPoint/BPProbe should be done with an atomic cpu')
     if np > 1:
-        fatal("SimPoint generation not supported with more than one CPUs")
+        fatal('SimPoint generation not supported with more than one CPUs')
 
+
+# Setting process to each CPU
 for i in range(np):
     if options.smt:
         system.cpu[i].workload = multiprocesses
@@ -278,6 +304,17 @@ else:
 if options.wait_gdb:
     for cpu in system.cpu:
         cpu.wait_for_remote_gdb = True
+
+for cpu in system.cpu:
+    # Assigning Replacement Policy
+    cpu.dcache.replacement_policy = eval(options.l1d_rp)()
+    cpu.icache.replacement_policy = eval(options.l1i_rp)()
+    system.l2.replacement_policy  = eval(options.l2_rp)()
+
+    # Assigning Lookup Latency
+    cpu.dcache.tag_latency = eval(options.l1d_ll)
+    cpu.icache.tag_latency = eval(options.l1i_ll)
+    system.l2.tag_latency  = eval(options.l2_ll)
 
 root = Root(full_system=False, system=system)
 Simulation.run(options, root, system, FutureClass)
