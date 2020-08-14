@@ -129,12 +129,12 @@ run_enhanced_test3:
 	@time ${GEM5_EXEC} -d ${TEST3_DIR}/${ENHANCED_M5OUT_DIR} ${EXEC_FILE} \
 		-c ${TEST3_DIR}/src/benchmark -o ${TEST3_DIR}/data/bombesin.hmm \
 		-I 100000000 --cpu-type=AtomicSimpleCPU --caches --l2cache \
-		--l1d_size=128kB --l1d_assoc=2 --l1d_hwp_type=TaggedPrefetcher \
+		--l1d_size=512kB --l1d_assoc=4 --l1d_hwp_type=AMPMPrefetcher \
 			--l1d_rp=LRURP --l1d_ll=2 \
-		--l1i_size=128kB --l1i_assoc=2 --l1i_hwp_type=TaggedPrefetcher \
+		--l1i_size=512kB --l1i_assoc=4 --l1i_hwp_type=AMPMPrefetcher \
 			--l1i_rp=LRURP --l1i_ll=2 \
-		--l2_size=1MB    --l2_assoc=2  --l2_hwp_type=TaggedPrefetcher \
-			--l2_rp=LRURP  --l2_ll=20  \
+		--l2_size=4MB    --l2_assoc=8  --l2_hwp_type=TaggedPrefetcher \
+			--l2_rp=LRURP  --l2_ll=10  \
 		--cacheline_size=64
 
 compare_test3:
