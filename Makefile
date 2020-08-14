@@ -41,7 +41,21 @@ run_test2:
 
 run_test3:
 	@time ${GEM5_EXEC} -d ${TEST3_DIR}/${M5OUT_DIR} ${EXEC_FILE} \
-		-c ${TEST3_DIR}/src/benchmark -o ${TEST3_DIR}/data/inp.in \
+		-c ${TEST3_DIR}/src/benchmark -o ${TEST3_DIR}/data/bombesin.hmm \
+		-I 100000000 --cpu-type=AtomicSimpleCPU --caches --l2cache \
+		--l1d_size=128kB --l1i_size=128kB --l2_size=1MB --l1d_assoc=2 \
+		--l1i_assoc=2 --l2_assoc=1 --cacheline_size=64
+
+run_test4:
+	@time ${GEM5_EXEC} -d ${TEST4_DIR}/${M5OUT_DIR} ${EXEC_FILE} \
+		-c ${TEST4_DIR}/src/benchmark -o ${TEST4_DIR}/data/test.txt \
+		-I 100000000 --cpu-type=AtomicSimpleCPU --caches --l2cache \
+		--l1d_size=128kB --l1i_size=128kB --l2_size=1MB --l1d_assoc=2 \
+		--l1i_assoc=2 --l2_assoc=1 --cacheline_size=64
+
+run_test5:
+	@time ${GEM5_EXEC} -d ${TEST5_DIR}/${M5OUT_DIR} ${EXEC_FILE} \
+		-c ${TEST5_DIR}/src/benchmark -o ${TEST5_DIR}/data/lbm.in \
 		-I 100000000 --cpu-type=AtomicSimpleCPU --caches --l2cache \
 		--l1d_size=128kB --l1i_size=128kB --l2_size=1MB --l1d_assoc=2 \
 		--l1i_assoc=2 --l2_assoc=1 --cacheline_size=64
