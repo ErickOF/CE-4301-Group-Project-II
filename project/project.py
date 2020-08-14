@@ -25,22 +25,24 @@ parser.add_option('--l2a', help='L2 cache associativity')
 class L1Cache(Cache):
     """This class represents a base class for L1 Cache.
     """
-    def __init__(self, assoc=None, tag_latency=None, prefetcher=None):
+    def __init__(self, assoc=2, tag_latency=2, prefetcher=None,
+                replacement_policy=None):
         # Init parent class
         super(L1Cache, self).__init__()
 
         # Settings
-        self.assoc = assoc if assoc else 2
-        self.tag_latency = tag_latency if tag_latency else 2
+        self.assoc = assoc
+        self.tag_latency = tag_latency
         self.data_latency = 2
         self.response_latency = 2
         self.mshrs = 4
         self.tgts_per_mshr = 20
-        self.prefetcher = None
 
         # Choose prefetcher
         if prefetcher:
-            if prefetcher == 'MultiPrefetcher':
+            if prefetcher == 'BasePrefetcher':
+                self.prefetcher = BasePrefetcher()
+            elif prefetcher == 'MultiPrefetcher':
                 self.prefetcher = MultiPrefetcher()
             elif prefetcher == 'QueuedPrefetcher':
                 self.prefetcher = QueuedPrefetcher()
@@ -87,11 +89,12 @@ class L1ICache(L1Cache):
     """This class represents a L1 Cache for intructions.
     """
     def __init__(self, size='16kB', assoc=None, tag_latency=None,
-                 prefetcher=None):
+                 prefetcher=None, replacement_policy=None):
         # Init parent class
         L1Cache.__init__(self, assoc=assoc, tag_latency=tag_latency,
-                         prefetcher=prefetcher)
-        self.size = '16kB'
+                         prefetcher=prefetcher,
+                         replacement_policy=replacement_policy)
+        self.size = size
 
     def connectCPU(self, cpu):
         """This method connects a CPU with the Cache.
@@ -101,7 +104,12 @@ class L1ICache(L1Cache):
 class L1DCache(L1Cache):
     """This class represents a L1 Cache for data.
     """
-    size = '64kB'
+    def __init__(self, size='64kB', assoc=None, tag_latency=None,
+                 prefetcher=None, replacement_policy=None):
+        L1Cache.__init__(self, assoc=assoc, tag_latency=tag_latency,
+                         prefetcher=prefetcher,
+                         replacement_policy=replacement_policy)
+        self.size = size
 
     def connectCPU(self, cpu):
         """This method connect a CPU with the Cache.
@@ -111,13 +119,55 @@ class L1DCache(L1Cache):
 class L2Cache(Cache):
     """This class represents a L2 Cache (for data and instructions).
     """
-    size = '256kB'
-    assoc = 8
-    tag_latency = 20
-    data_latency = 20
-    response_latency = 20
-    mshrs = 20
-    tgts_per_mshr = 12
+    def __init__(self, assoc=8, tag_latency=20, prefetcher=None,
+                replacement_policy=None):
+        # Init parent class
+        super(L2Cache, self).__init__()
+        # Settings
+        self.size = '256kB'
+        self.assoc = assoc
+        self.tag_latency = tag_latency
+        self.data_latency = 20
+        self.response_latency = 20
+        self.mshrs = 20
+        self.tgts_per_mshr = 12
+
+        # Choose prefetcher
+        if prefetcher:
+            if prefetcher == 'BasePrefetcher':
+                self.prefetcher = BasePrefetcher()
+            elif prefetcher == 'MultiPrefetcher':
+                self.prefetcher = MultiPrefetcher()
+            elif prefetcher == 'QueuedPrefetcher':
+                self.prefetcher = QueuedPrefetcher()
+            elif prefetcher == 'StridePrefetcher':
+                self.prefetcher = StridePrefetcher()
+            elif prefetcher == 'TaggedPrefetcher':
+                self.prefetcher = TaggedPrefetcher()
+            elif prefetcher == 'IndirectMemoryPrefetcher':
+                self.prefetcher = IndirectMemoryPrefetcher()
+            elif prefetcher == 'SignaturePathPrefetcher':
+                self.prefetcher = SignaturePathPrefetcher()
+            elif prefetcher == 'SignaturePathPrefetcherV2':
+                self.prefetcher = SignaturePathPrefetcherV2()
+            elif prefetcher == 'AMPMPrefetcher':
+                self.prefetcher = AMPMPrefetcher()
+            elif prefetcher == 'DCPTPrefetcher':
+                self.prefetcher = DCPTPrefetcher()
+            elif prefetcher == 'IrregularStreamBufferPrefetcher':
+                self.prefetcher = IrregularStreamBufferPrefetcher()
+            elif prefetcher == 'SlimAMPMPrefetcher':
+                self.prefetcher = SlimAMPMPrefetcher()
+            elif prefetcher == 'BOPPrefetcher':
+                self.prefetcher = BOPPrefetcher()
+            elif prefetcher == 'SBOOEPrefetcher':
+                self.prefetcher = SBOOEPrefetcher()
+            elif prefetcher == 'STeMSPrefetcher':
+                self.prefetcher = STeMSPrefetcher()
+            elif prefetcher == 'PIFPrefetcher':
+                self.prefetcher = PIFPrefetcher()
+            else:
+                raise ValueError('No valid prefetcher was given.')
 
     def connectCPUSideBus(self, bus):
         """This method
@@ -148,8 +198,10 @@ class AtomicSimpleCPUSystem(System):
         self.cpu = AtomicSimpleCPU()
 
         # Creating L1 Caches
-        self.cpu.dcache = L1DCache()
-        self.cpu.icache = L1ICache()
+        self.cpu.dcache = L1DCache(assoc=args.l1a, tag_latency=args.l1ll,
+                                    prefetcher=args.l1pf)
+        self.cpu.icache = L1ICache(assoc=args.l1a, tag_latency=args.l1ll,
+                                    prefetcher=args.l1pf)
 
         # Connect bus to data and instructions cache
         self.cpu.icache.connectCPU(self.cpu)
@@ -164,7 +216,8 @@ class AtomicSimpleCPUSystem(System):
         self.cpu.dcache.connectBus(self.l2bus)
 
         # Creating L2 cache
-        self.l2cache = L2Cache()
+        self.l2cache = L2Cache(assoc=args.l2a)
+
         # Connecting L2 cache to the bus
         self.l2cache.connectCPUSideBus(self.l2bus)
 

@@ -4,6 +4,14 @@ SETUP_GEM5_SCRIPT=config_scripts/setup_gem5.sh
 SETUP_PARSEC_SCRIPT=config_scripts/setup_parsec.sh
 DEBUG_DIR=project/debug_out
 M5OUT_DIR=m5out
+GEM5_DIR=./gem5
+TEST1_DIR=./project/test1_401.bzip2
+TEST2_DIR=./project/test2_429.mcf
+TEST3_DIR=./project/test3_456.hmmer
+TEST4_DIR=./project/test4_458.sjeng
+TEST5_DIR=./project/test5_470.lbm
+GEM5_EXEC=${GEM5_DIR}/build/X86/gem5.opt
+EXEC_FILE=project/se.py
 
 
 setup_gem5:
@@ -15,22 +23,25 @@ setup_parsec:
 	@./${SETUP_PARSEC_SCRIPT}
 
 test_gem5:
-	@gem5/build/X86/gem5.opt gem5/tests/configs/learning-gem5-p1-simple.py
+	@${GEM5_EXEC} gem5/tests/configs/learning-gem5-p1-simple.py
 
-test_parsec:
-	@echo ""
+run_test1:
+	@time ${GEM5_EXEC} -d ${TEST1_DIR}/${M5OUT_DIR} ${EXEC_FILE} \
+		-c ${TEST1_DIR}/src/benchmark -o ${TEST1_DIR}/data/input.program \
+		-I 100000000 --cpu-type=AtomicSimpleCPU --caches --l2cache \
+		--l1d_size=128kB --l1i_size=128kB --l2_size=1MB --l1d_assoc=2 \
+		--l1i_assoc=2 --l2_assoc=1 --cacheline_size=64
 
-test_example:
-	@gem5/build/X86/gem5.opt project/test.py
+run_test2:
+	@time ${GEM5_EXEC} -d ${TEST2_DIR}/${M5OUT_DIR} ${EXEC_FILE} \
+		-c ${TEST2_DIR}/src/benchmark -o ${TEST2_DIR}/data/inp.in \
+		-I 100000000 --cpu-type=AtomicSimpleCPU --caches --l2cache \
+		--l1d_size=128kB --l1i_size=128kB --l2_size=1MB --l1d_assoc=2 \
+		--l1i_assoc=2 --l2_assoc=1 --cacheline_size=64
 
-run_project_test1:
-	@gem5/build/X86/gem5.opt --debug-flags=Cache project/project.py --l1pf A --l1rp A --l1ll A --l1a 2 \
-			--l2pf B --l2rp B --l2ll B --l2a 8 >> ${DEBUG_DIR}/tb_result1.txt
-	#@cat ${DEBUG_DIR}/tb_result1.txt
-	@mv ${M5OUT_DIR}/* ${DEBUG_DIR}
-
-run_project_test:
-	@gem5/build/X86/gem5.opt project/project.py --l1pf A --l1rp A --l1ll 2 --l1a 2 \
-			--l2pf B --l2rp B --l2ll 20 --l2a 8
-	#@cat ${DEBUG_DIR}/tb_result1.txt
-	@mv ${M5OUT_DIR}/* ${DEBUG_DIR}
+run_test3:
+	@time ${GEM5_EXEC} -d ${TEST3_DIR}/${M5OUT_DIR} ${EXEC_FILE} \
+		-c ${TEST3_DIR}/src/benchmark -o ${TEST3_DIR}/data/inp.in \
+		-I 100000000 --cpu-type=AtomicSimpleCPU --caches --l2cache \
+		--l1d_size=128kB --l1i_size=128kB --l2_size=1MB --l1d_assoc=2 \
+		--l1i_assoc=2 --l2_assoc=1 --cacheline_size=64
