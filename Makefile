@@ -195,10 +195,9 @@ test4: run_test4 run_enhanced_test4 compare_test4
 # computationally most important part of a larger code which is used
 # in the field of material science to simulate the behavior of fluids
 # with free surfaces, in particluar the formation and movement of gas
-# bubbles in metal foams (see the FreeWiHR homepage for animations of
-# the results). For benchmarking purposes and easy optimization for
-# different architectures, the code makes extensive use of macros
-# which hide the details of the data access.
+# bubbles in metal foams. For benchmarking purposes and easy
+# optimization for different architectures, the code makes extensive
+# use of macros which hide the details of the data access.
 run_test5:
 	@time ${GEM5_EXEC} -d ${TEST5_DIR}/${M5OUT_DIR} ${EXEC_FILE} \
 		-c ${TEST5_DIR}/src/benchmark -o ${TEST5_DIR}/data/lbm.in \
@@ -208,19 +207,19 @@ run_test5:
 		--l1i_size=128kB --l1i_assoc=2 --l1i_hwp_type=TaggedPrefetcher \
 			--l1i_rp=LRURP --l1i_ll=2 \
 		--l2_size=1MB    --l2_assoc=2  --l2_hwp_type=TaggedPrefetcher \
-			--l2_rp=LRURP  --l2_ll=20  \
+			--l2_rp=LRURP  --l2_ll=20 \
 		--cacheline_size=64
 
 run_enhanced_test5:
 	@time ${GEM5_EXEC} -d ${TEST5_DIR}/${ENHANCED_M5OUT_DIR} ${EXEC_FILE} \
 		-c ${TEST5_DIR}/src/benchmark -o ${TEST5_DIR}/data/lbm.in \
 		-I 100000000 --cpu-type=AtomicSimpleCPU --caches --l2cache \
-		--l1d_size=128kB --l1d_assoc=2 --l1d_hwp_type=TaggedPrefetcher \
+		--l1d_size=64kB --l1d_assoc=1 --l1d_hwp_type=AMPMPrefetcher \
 			--l1d_rp=LRURP --l1d_ll=2 \
-		--l1i_size=128kB --l1i_assoc=2 --l1i_hwp_type=TaggedPrefetcher \
+		--l1i_size=64kB --l1i_assoc=1 --l1i_hwp_type=AMPMPrefetcher \
 			--l1i_rp=LRURP --l1i_ll=2 \
-		--l2_size=1MB    --l2_assoc=2  --l2_hwp_type=TaggedPrefetcher \
-			--l2_rp=LRURP  --l2_ll=20  \
+		--l2_size=512kB    --l2_assoc=1  --l2_hwp_type=SlimAMPMPrefetcher \
+			--l2_rp=FIFORP  --l2_ll=20 \
 		--cacheline_size=64
 
 compare_test5:

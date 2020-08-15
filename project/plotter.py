@@ -32,17 +32,17 @@ def parse_information(lines: list) -> list:
         elif 'system.l2.overall_hits::total' in line:
             line = line.replace(' ', '').replace('\t', '')
             index = line.index('#')
-            result.append(eval(line[len('system.l2.overall_hits::total'):index]) / 1000)
+            result.append(eval(line[len('system.l2.overall_hits::total'):index]))
             
         elif 'system.l2.overall_misses::total' in line:
             line = line.replace(' ', '').replace('\t', '')
             index = line.index('#')
-            result.append(eval(line[len('system.l2.overall_misses::total'):index]) / 1e6)
+            result.append(eval(line[len('system.l2.overall_misses::total'):index]))
             
         elif 'system.l2.demand_accesses::total' in line:
             line = line.replace(' ', '').replace('\t', '')
             index = line.index('#')
-            result.append(eval(line[len('system.l2.demand_accesses::total'):index]) / 1e6)
+            result.append(eval(line[len('system.l2.demand_accesses::total'):index]))
             
         elif 'system.cpu.icache.overall_hits::total' in line:
             line = line.replace(' ', '').replace('\t', '')
@@ -96,7 +96,8 @@ if __name__ == '__main__':
             'L1 DCache Hits', 'L1 DCache Misses', 'L1 DCache Total Access']
     
     # Y Labels
-    y_labels = ['kInstr/s', '1e3 hits', '1e6 miss', '1e6 access', '', '', '', '', '', '']
+    y_labels = ['kInstr/s', 'hits', 'miss', 'access', 'hits', 'miss',
+                'access', 'hit', 'miss', 'access']
 
     # Show data
     i = 0
