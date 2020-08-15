@@ -103,7 +103,7 @@ if __name__ == '__main__':
 
     for (d1, d2, tag) in zip(normal_data, enhanced_data, titles):
         print(tag, end='\t\t' if i not in [3, 6, 9] else '\t')
-        print(d1, d2, round(100*(d2 - d1)/max(d1, d2), 2), sep='\t\t')
+        print(d1, d2, (100*(d2 - d1)/max(d1, d2), 2), sep='\t\t')
 
         i += 1
 
